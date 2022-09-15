@@ -55,7 +55,8 @@ def _get_blocks(chunks, min_x, min_y, min_z, max_x, max_y, max_z):
     for x in range(max_x - min_x + 1):
         for y in range(max_y - min_y + 1):
             for z in range(max_z - min_z + 1):
-                print("Loading blocks " + str(len(blocks)).zfill(len(str(total_blocks))) + "/" + str(total_blocks), end='\r')
+                print("Loading blocks " + str(len(blocks)).zfill(len(str(total_blocks))) + "/" + str(total_blocks),
+                      end='\r')
 
                 current_x = min_x + x
                 current_y = min_y + y
@@ -77,5 +78,5 @@ def _get_block(chunk, x, y, z):
         "id": block.id,
         "properties": block.properties,
         "nbt": nbt,
-        "xyz": (x,y,z)
+        "xyz": (x, y, z)
     }

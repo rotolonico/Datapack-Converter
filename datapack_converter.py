@@ -150,9 +150,11 @@ def find_chains(blocks):
             }
             rCount += 1
 
-    write_datapack(args.world_path, chains, "map_name" if args.n is None else args.n, args.f, args.d, all_blocks, args.r, args.s)
+    write_datapack(args.world_path, chains, "map_name" if args.n is None else args.n, args.f, args.d, all_blocks,
+                   args.r, args.s)
 
 
+# Find a chain from the initial block by checking nearby chain blocks with the correct facing
 def find_chain_from_block(initial_block, chain_id):
     chain = {}
     current_block = initial_block
@@ -167,6 +169,7 @@ def find_chain_from_block(initial_block, chain_id):
             "has_name": name != command_id,
             "command": current_block["nbt"]["Command"].value,
             "is_auto": is_command_block_auto(current_block),
+            # if a conditional command relies on this command
             "is_relied_on": is_command_block_relied_on(current_block),
             "is_conditional": is_command_block_conditional(current_block),
             "conditioned_by": command_block_conditioner(current_block),

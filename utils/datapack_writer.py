@@ -2,8 +2,6 @@ import os
 import shutil
 import random
 
-warning_tellraw = ''
-
 world_path = ""
 datapack_name = ""
 datapack_path = ""
@@ -123,6 +121,8 @@ def print_chain(chain):
 def store_init_data():
     initial_data_commands = "\n# Initial states of the command blocks (storing if they started out active/inactive, successful/unsuccessful)\n"
 
+    # We go through every command and check if it was initially needs redstone or always active etc...
+    # and add this data to the storage
     for chain in chains:
         commands = chains[chain]["chain"]
         for c in commands:
@@ -149,6 +149,8 @@ def store_init_data():
 def store_commands():
     unique = set()
     for chain in chains:
+
+        # If -r argument is set, randomise all chain names
         if randomise:
             chains[chain]["name"] = generate_random_unique_string(unique)
 
@@ -240,6 +242,8 @@ def store_commands():
                                                                                                          new_command)
 
             command["command"] = new_command
+
+            # Add comments to the commands if they have a name or a warning
             if not randomise and command["has_name"]:
                 new_function.write("# " + command["display_name"] + "\n")
             if not hide_warnings and not toggles_command and check_warnings(new_command, chains[chain]["name"]):
@@ -256,6 +260,8 @@ def call_commands():
         active_prefix = "execute if data storage dp_conv:{} {{{}_0_auto:1b}} run".format(datapack_name,
                                                                                          chain["id"])
 
+        # If the command is repeating, call it every tick. If it's impulse, call it only when its run state is false
+        # and set its run state to true as soon as it is run (it will be set back to false when it gets deactivated)
         if chain["is_repeating"]:
             call_commands_code += "{} function {}:{}\n".format(active_prefix, datapack_name, chain["name"])
         else:
@@ -265,6 +271,10 @@ def call_commands():
             call_commands_code += "{} data merge storage dp_conv:{} {{{}_0_run:1b}}\n".format(active_prefix,
                                                                                               datapack_name,
                                                                                               chain["id"])
+
+    # We store the command success state so conditional commands know when to run.
+    # Repeating commands will have their success state reset at the end of the tick
+    # Commands also have their success state reset when they get activated
     for c in all_commands:
         cmd = all_commands[c]
         if "r" in cmd["id"]:
@@ -280,6 +290,7 @@ def call_commands():
 
 
 def delete_command_blocks():
+    # We have to fill every command individually to air because the area might be too big to fill all at once
     delete_blocks_commands = "\n# Deleting command blocks (script was executed with -d argument)\n"
     for chain in chains:
         commands = chains[chain]["chain"]
@@ -312,9 +323,13 @@ def check_warnings(command, chain_name):
 
     split_command = command.split(" ")
 
+    # If there is relative positioning and no 'at', the position is relative to the command block, which is a potential
+    # problem.
     if "at" not in split_command and "~" in command:
         is_warning = True
     else:
+        # Also, if positioning is absolute, and it is included in the blocks loaded (all_blocks), some commands could
+        # be affecting the command blocks themselves, which is also a problem
         for c in range(len(split_command) - 2):
             found_coords = True
             for i in range(3):
@@ -334,6 +349,7 @@ def check_warnings(command, chain_name):
 
 
 def add_warnings():
+    # Shows the warning message and adds the warnings to warning.txt
     warnings_load_prepend = '# Warnings triggered\ndata merge storage dp_conv:init {"warnings":1b}\n'
     with open(os.path.join(functions_path, "load.mcfunction"), 'r+') as file:
         content = file.read()
