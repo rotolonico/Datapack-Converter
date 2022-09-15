@@ -1,0 +1,5 @@
+anvil-new==1.0.1
+enum34
+frozendict
+NBT
+numpy
