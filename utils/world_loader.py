@@ -2,10 +2,16 @@ import anvil
 import math
 import os
 
+dimensions_prefix = {
+    "overworld": "",
+    "the_nether": "DIM-1",
+    "the_end": "DIM1"
+}
 
-def get_blocks_from_coordinates(world_path, min_x, min_y, min_z, max_x, max_y, max_z):
+
+def get_blocks_from_coordinates(world_path, min_x, min_y, min_z, max_x, max_y, max_z, dimension):
     chunk_ids = _get_chunk_ids_from_coordinates(min_x, max_x, min_z, max_z)
-    chunks = _get_chunks(chunk_ids, world_path)
+    chunks = _get_chunks(chunk_ids, world_path, dimension)
     blocks = _get_blocks(chunks, min_x, min_y, min_z, max_x, max_y, max_z)
     return blocks
 
@@ -30,11 +36,11 @@ def _get_region_id_from_chunk_id(c):
     return "r." + str(c[0] >> 5) + "." + str(c[1] >> 5) + ".mca"
 
 
-def _get_chunks(chunk_ids, world_path):
+def _get_chunks(chunk_ids, world_path, dimension):
     chunks = {}
     for chunk_id in chunk_ids:
         try:
-            chunks[chunk_id] = _get_chunk(chunk_id, world_path)
+            chunks[chunk_id] = _get_chunk(chunk_id, world_path, dimension)
         except Exception as e:
             print("Something went wrong loading chunk " + str(chunk_id) + ": " + str(e))
             chunks[chunk_id] = None
@@ -42,9 +48,10 @@ def _get_chunks(chunk_ids, world_path):
     return chunks
 
 
-def _get_chunk(chunk_id, world_path):
+def _get_chunk(chunk_id, world_path, dimension):
     return anvil.Chunk.from_region(
-        os.path.join(os.path.join(world_path, "region"), _get_region_id_from_chunk_id(chunk_id)), chunk_id[0],
+        os.path.join(os.path.join(world_path, dimensions_prefix[dimension], "region"),
+                     _get_region_id_from_chunk_id(chunk_id)), chunk_id[0],
         chunk_id[1])
 
 

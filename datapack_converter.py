@@ -151,7 +151,7 @@ def find_chains(blocks):
             rCount += 1
 
     write_datapack(args.world_path, chains, "map_name" if args.n is None else args.n, args.f, args.d, all_blocks,
-                   args.r, args.s)
+                   args.r, args.s, args.dim)
 
 
 # Find a chain from the initial block by checking nearby chain blocks with the correct facing
@@ -270,11 +270,20 @@ if __name__ == '__main__':
                         help='Assign a random name to all functions generated and remove comments')
     parser.add_argument('-s', '-silent-warnings', action='store_true',
                         help='Hide warnings')
+    parser.add_argument('-dim', '-dimension', type=str,
+                        help='The dimension the area to convert is in. Possible values are \'overworld", \'the_nether\' or \'the_end\'. Overworld by default')
 
     args = parser.parse_args()
 
     if args.n is not None and not re.match("^[a-z0-9._-]+$", args.n):
         print("Datapack name is invalid. Only a-z 0-9 ._- characters are allowed!")
+        exit(0)
+
+    if args.dim is None:
+        args.dim = "overworld"
+
+    if args.dim != "overworld" and args.dim != "the_nether" and args.dim != "the_end":
+        print(args.dim + " is not supported. Supported dimensions are 'overworld', 'the_nether' and 'the_end'!")
         exit(0)
 
     min_x = min(args.x1, args.x2)
@@ -284,5 +293,5 @@ if __name__ == '__main__':
     max_y = max(args.y1, args.y2)
     max_z = max(args.z1, args.z2)
 
-    blocks = get_blocks_from_coordinates(args.world_path, min_x, min_y, min_z, max_x, max_y, max_z)
+    blocks = get_blocks_from_coordinates(args.world_path, min_x, min_y, min_z, max_x, max_y, max_z, args.dim)
     find_chains(blocks)

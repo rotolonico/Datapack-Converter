@@ -11,6 +11,7 @@ all_commands = {}
 all_blocks = {}
 randomise = False
 hide_warnings = False
+dimension = ""
 
 warnings_message = ""
 any_warnings = False
@@ -26,7 +27,7 @@ merge_alternatives = [
 
 
 def write_datapack(world_save_path, chains_to_convert, dp_name, force, delete_cmds, all_loaded_blocks, r,
-                   s):
+                   s, d):
     global world_path
     global datapack_path
     global datapack_name
@@ -35,6 +36,7 @@ def write_datapack(world_save_path, chains_to_convert, dp_name, force, delete_cm
     global all_blocks
     global randomise
     global hide_warnings
+    global dimension
 
     world_path = world_save_path
     datapacks_path = os.path.join(world_path, "datapacks")
@@ -43,6 +45,7 @@ def write_datapack(world_save_path, chains_to_convert, dp_name, force, delete_cm
     all_blocks = all_loaded_blocks
     randomise = r
     hide_warnings = s
+    dimension = d
 
     if not os.path.exists(datapacks_path):
         os.makedirs(datapacks_path)
@@ -162,6 +165,10 @@ def store_commands():
 
             # Removing / since it's not allowed in datapacks
             new_command = new_command.strip("/")
+
+            # If the commands are not in the overworld, we have to execute all the commands in their dimension
+            if dimension != "overworld":
+                new_command = "execute in minecraft:{} run {}".format(dimension, new_command)
 
             # Checking if the command is a 'data merge block x y z {auto:B} type
             # If it's the case we have to replace it with the storage command
@@ -294,13 +301,22 @@ def delete_command_blocks():
     delete_blocks_commands = "\n# Deleting command blocks (script was executed with -d argument)\n"
     for chain in chains:
         commands = chains[chain]["chain"]
+
+        # If the command blocks are not in the overworld, we have to delete them in their dimension
+        dimension_prefix = ""
+        if dimension != "overworld":
+            dimension_prefix = "execute in minecraft:{} run ".format(dimension)
+
         for c in commands:
-            delete_blocks_commands += "fill {} {} {} {} {} {} air replace #signs\n".format(c[0] - 1, c[1] - 1, c[2] - 1,
-                                                                                           c[0] + 1, c[1] + 1, c[2] + 1)
+            delete_blocks_commands += "{}fill {} {} {} {} {} {} air replace #signs\n".format(dimension_prefix, c[0] - 1,
+                                                                                             c[1] - 1, c[2] - 1,
+                                                                                             c[0] + 1, c[1] + 1,
+                                                                                             c[2] + 1)
         for c in commands:
-            delete_blocks_commands += "fill {} {} {} {} {} {} air replace {}\n".format(c[0] - 1, c[1] - 1, c[2] - 1,
-                                                                                       c[0] + 1, c[1] + 1, c[2] + 1,
-                                                                                       commands[c]["block_id"])
+            delete_blocks_commands += "{}fill {} {} {} {} {} {} air replace {}\n".format(dimension_prefix, c[0] - 1,
+                                                                                         c[1] - 1, c[2] - 1,
+                                                                                         c[0] + 1, c[1] + 1, c[2] + 1,
+                                                                                         commands[c]["block_id"])
 
     init_function = open(os.path.join(functions_path, "init.mcfunction"), 'a')
     init_function.write(delete_blocks_commands)

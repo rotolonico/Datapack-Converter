@@ -24,6 +24,7 @@ Convert Minecraft command block chains to a datapack!
   - **-f, -force:** Overwrite existing datapack with the same name. False by default
   - **-d, -delete-commands:**  Automatically delete the command blocks converted from the world. False by default
   - **-r, -randomize-functions:** Assign a random name to all functions generated and remove comments
+  - **-dim, -dimension:** The dimension the area to convert is in. Possible values are "overworld", "the_nether" or "the_end". Overworld by default
 
 ## How it works
 - Blocks selected are loaded in from regions using the [anvil-new Python library](https://github.com/Intergalactyc/anvil-new)
