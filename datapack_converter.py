@@ -151,7 +151,7 @@ def find_chains(blocks):
             rCount += 1
 
     write_datapack(args.world_path, chains, "map_name" if args.n is None else args.n, args.f, args.d, all_blocks,
-                   args.r, args.s, args.dim)
+                   args.r, args.s, args.dim, args.se)
 
 
 # Find a chain from the initial block by checking nearby chain blocks with the correct facing
@@ -272,6 +272,8 @@ if __name__ == '__main__':
                         help='Hide warnings')
     parser.add_argument('-dim', '-dimension', type=str,
                         help='The dimension the area to convert is in. Possible values are \'overworld", \'the_nether\' or \'the_end\'. Overworld by default')
+    parser.add_argument('-se', '-strip-execute', action='store_true',
+                        help='Removes all \'run execute\' syntax from the datapack to increase readability. \'execute A run execute B run C\' becomes \'execute A B run C\'. False by default')
 
     args = parser.parse_args()
 

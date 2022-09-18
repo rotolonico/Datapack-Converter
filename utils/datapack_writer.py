@@ -27,7 +27,7 @@ merge_alternatives = [
 
 
 def write_datapack(world_save_path, chains_to_convert, dp_name, force, delete_cmds, all_loaded_blocks, r,
-                   s, d):
+                   s, d, se):
     global world_path
     global datapack_path
     global datapack_name
@@ -37,6 +37,7 @@ def write_datapack(world_save_path, chains_to_convert, dp_name, force, delete_cm
     global randomise
     global hide_warnings
     global dimension
+    global strip_execute
 
     world_path = world_save_path
     datapacks_path = os.path.join(world_path, "datapacks")
@@ -46,6 +47,7 @@ def write_datapack(world_save_path, chains_to_convert, dp_name, force, delete_cm
     randomise = r
     hide_warnings = s
     dimension = d
+    strip_execute = se
 
     if not os.path.exists(datapacks_path):
         os.makedirs(datapacks_path)
@@ -251,6 +253,10 @@ def store_commands():
                                                                                                          command["id"],
                                                                                                          new_command)
 
+            # If -se flag is on, remove nested execute syntax to increase readability
+            if strip_execute:
+                new_command = new_command.replace(" run execute ", " ")
+
             command["command"] = new_command
 
             # Add comments to the commands if they have a name or a warning
@@ -294,6 +300,9 @@ def call_commands():
             call_commands_code += "{} data merge storage dp_conv:{} {{{}_success:0b}}\n".format(active_prefix,
                                                                                                 datapack_name,
                                                                                                 cmd["id"])
+    # If -se flag is on, remove nested execute syntax to increase readability
+    if strip_execute:
+        call_commands_code = call_commands_code.replace(" run execute ", " ")
 
     tick_function = open(os.path.join(functions_path, "tick.mcfunction"), 'a')
     tick_function.write(call_commands_code)
