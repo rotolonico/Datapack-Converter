@@ -209,7 +209,10 @@ def store_commands():
                 if coords in all_commands:
                     cmd_id = all_commands[coords]["id"]
                     function_name = "{}_{}".format("activate" if activates_command else "deactivate", cmd_id)
-                    command_to_replace = "function {}:{}".format(datapack_name, function_name)
+                    # If the command is already activated/deactivated, we have to make the command not succeed
+                    # (that's why the unless clause is there)
+                    command_to_replace = "execute unless data storage dp_conv:{} {{\"{}_auto\":{}}} run function {}:{}".format(
+                        datapack_name, cmd_id, "1b" if activates_command else "0b", datapack_name, function_name)
                     for a in merge_alternatives:
                         new_command = new_command.replace(a.format(possible_coords[0], possible_coords[1],
                                                                    possible_coords[2]), command_to_replace)
