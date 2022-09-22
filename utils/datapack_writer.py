@@ -97,7 +97,7 @@ def write_datapack(world_save_path, chains_to_convert, dp_name, force, delete_cm
 
     print("")
     print("Done! Open the world to finalise the conversion")
-    print("If you missed the finalisation text in-game or need to see it again, you can run the following commands:")
+    print("If you missed the finalisation text in-game or need to see it again, you can run the following command:")
     print("- /data remove storage dp_conv:init \"init\"")
 
 
