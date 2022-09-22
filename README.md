@@ -56,3 +56,6 @@ explains how it works!
 - Thanks to matcool for the [original anvil-parser library](https://github.com/matcool/anvil-parser) for loading
   Minecraft regions in Python
 - Thanks to Intergalactyc for [updating the library](https://github.com/Intergalactyc/anvil-new) for Minecraft 1.18+ 
+
+## Looking for the opposite conversion?
+Check out the [Commands-Converter](https://github.com/rotolonico/Commands-Converter)
